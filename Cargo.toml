@@ -1,0 +1,18 @@
+[package]
+name = "openrent"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+axum = { version = "*", features = ["json", "multipart"] }
+boa_engine = "*"
+geo = "*"
+kml = { version = "*", features = ["geo-types"] }
+reqwest = { version = "*", features = ["blocking"] }
+scraper = "*"
+serde = "*"
+tokio = { version = "*", features = ["macros", "rt-multi-thread"] }
+tower-http = { version = "*", features = ["fs"] }
