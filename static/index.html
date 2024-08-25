@@ -1,58 +1,47 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+        <link rel="stylesheet" href="/style.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     </head>
     <body>
-        <div id="map" style="height: 600px"></div>
-        <form enctype="multipart/form-data" method="post" name="kml-file" id="kml-file">
-            <p>
+        <div id="search">
+            <form enctype="multipart/form-data" method="post" name="kml-file" id="kml-file">
+                <p>
                 <input type="file" name="file" required />
                 <input type="submit" value="Load" />
-            </p>
-        </form>
+                </p>
+            </form>
+            <form name="filters" id="filters">
+                <p>
+                Rent:<br>
+                <label for="rent-min">min:</label>
+                <input type="number" name="rent-min" id="rent-min" /><br>
+                <label for="rent-max">max:</label>
+                <input type="number" name="rent-max" id="rent-max" /><br>
+                </p>
+                <p>
+                Bedrooms:<br>
+                <label for="bedrooms-min">min:</label>
+                <input type="number" name="bedrooms-min" id="bedrooms-min" /><br>
+                <label for="bedrooms-max">max:</label>
+                <input type="number" name="bedrooms-max" id="bedrooms-max" /><br>
+                </p>
+                <p>
+                <input type="checkbox" value="studio" id="studio" />
+                <label for="studio">Studio</label>
+                </p>
+                <p>
+                <input type="checkbox" value="shared" id="shared" />
+                <label for="shared">Shared</label>
+                </p>
+                <p>
+                <input type="submit" value="Filter" />
+                </p>
+            </form>
+        </div>
+        <div id="map"></div>
         <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-        <script>
-            var center = [51.505, -0.09];
-            var radius = 30000;
-            let zoom = 12;
-            var map = L.map('map').setView(center, zoom);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
-
-            const form = document.querySelector("#kml-file");
-            form.addEventListener("submit", (event) => {
-                const formData = new FormData(form);
-                fetch("/search", { method: "POST", body: formData, })
-                    .then((response) => response.json())
-                    .then((response) => {
-                        map.eachLayer((l) => {
-                            if (l instanceof L.Marker || l instanceof L.Polygon) {
-                                map.removeLayer(l)
-                            }
-                        })
-
-                        response.properties
-                            .filter((p) => {
-                                console.log(p);
-                                return p.studio == false && 
-                                    p.shared == false &&
-                                    p.price >= 1500 && p.price <= 2000 &&
-                                    p.bedrooms >= 1 && p.bedrooms <= 2
-                            }).forEach((p) => {
-                                L.marker([p.latitude, p.longitude])
-                                    .bindPopup(`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`)
-                                    .addTo(map);
-                            });
-
-                        var latlngs = response.polygons.map((p) => [p.external, ...p.internals]);
-                        var polygon = L.polygon(latlngs).addTo(map);
-                        map.fitBounds(polygon.getBounds());
-                    });
-                event.preventDefault();
-            });
-        </script>
+        <script src="/script.js"></script>
     </body>
 </html>
