@@ -40,14 +40,27 @@ function reset() {
 }
 
 function drawMarkers() {
+	const isStudio = document.querySelector("#studio").checked;
+	const isShared = document.querySelector("#shared").checked;
+
+	const rentMinStr = document.querySelector("#rent-min").value;
+	const rentMaxStr = document.querySelector("#rent-max").value;
+	const rentMin = rentMinStr == "" ? 0 : Number(rentMinStr);
+	const rentMax = rentMaxStr == "" ? Infinity : Number(rentMaxStr);
+
+	const bedroomsMinStr = document.querySelector("#bedrooms-min").value;
+	const bedroomsMaxStr = document.querySelector("#bedrooms-max").value;
+	const bedroomsMin = bedroomsMinStr == "" ? 0 : Number(bedroomsMinStr);
+	const bedroomsMax = bedroomsMaxStr == "" ? Infinity : Number(bedroomsMaxStr);
+
 	properties
 		.filter((p) => {
-			return p.studio == document.querySelector("#studio").checked && 
-				p.shared == document.querySelector("#shared").checked &&
-				p.price >= document.querySelector("#rent-min").value &&
-				p.price <= document.querySelector("#rent-max").value &&
-				p.bedrooms >= document.querySelector("#bedrooms-min").value &&
-				p.bedrooms <= document.querySelector("#bedrooms-max").value
+			return p.studio == isStudio &&
+				p.shared == isShared &&
+				p.price >= rentMin &&
+				p.price <= rentMax &&
+				p.bedrooms >= bedroomsMin &&
+				p.bedrooms <= bedroomsMax
 		}).forEach((p) => {
 			L.marker([p.latitude, p.longitude])
 				.bindPopup(`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`)
