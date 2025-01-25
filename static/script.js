@@ -26,21 +26,7 @@ filterForm.addEventListener("submit", (event) => {
 	event.preventDefault();
 });
 
-function draw() {
-	reset();
-	drawPolygons();
-	drawMarkers();
-}
-
-function reset() {
-	map.eachLayer((l) => {
-		if (l instanceof L.Marker || l instanceof L.Polygon) {
-			map.removeLayer(l)
-		}
-	})
-}
-
-function drawMarkers() {
+function filter(props) {
 	const isStudio = document.querySelector("#studio").checked;
 	const isShared = document.querySelector("#shared").checked;
 
@@ -56,24 +42,42 @@ function drawMarkers() {
 		? Infinity
 		: Number(bedroomsMaxStr);
 
-	properties
+	return props
 		.filter((p) => {
 			return p.studio == isStudio &&
 				p.shared == isShared &&
 				p.price >= rentMin &&
 				p.price <= rentMax &&
 				p.bedrooms >= bedroomsMin &&
-				p.bedrooms <= bedroomsMax
-		}).forEach((p) => {
-			L.marker([p.latitude, p.longitude])
-				.bindPopup(`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`)
-				.addTo(map);
+				p.bedrooms <= bedroomsMax;
 		});
+}
 
+function draw() {
+	drawPolygons();
+	drawMarkers(filter(properties));
 }
 
 function drawPolygons() {
+	map.eachLayer((l) => {
+		if (l instanceof L.Polygon) map.removeLayer(l);
+	});
 	const latlngs = polygons.map((p) => [p.external, ...p.internals]);
 	const polygon = L.polygon(latlngs).addTo(map);
 	map.fitBounds(polygon.getBounds());
+}
+
+function drawMarkers(props) {
+	map.eachLayer((l) => {
+		if (l instanceof L.Marker) {
+			map.removeLayer(l);
+		}
+	});
+	props.forEach((p) => {
+		L.marker([p.latitude, p.longitude])
+			.bindPopup(
+				`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`,
+			)
+			.addTo(map);
+	});
 }
