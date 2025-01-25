@@ -1,46 +1,72 @@
-<html>
+<!doctype html>
+<html lang="en">
     <head>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
         <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     </head>
     <body>
-        <div id="search">
-            <form enctype="multipart/form-data" method="post" name="kml-file" id="kml-file">
-                <p>
-                <input type="file" name="file" required />
-                <input type="submit" value="Load" />
-                </p>
-            </form>
-            <form name="filters" id="filters">
-                <p>
-                Rent:<br>
-                <label for="rent-min">min:</label>
-                <input type="number" name="rent-min" id="rent-min" /><br>
-                <label for="rent-max">max:</label>
-                <input type="number" name="rent-max" id="rent-max" /><br>
-                </p>
-                <p>
-                Bedrooms:<br>
-                <label for="bedrooms-min">min:</label>
-                <input type="number" name="bedrooms-min" id="bedrooms-min" /><br>
-                <label for="bedrooms-max">max:</label>
-                <input type="number" name="bedrooms-max" id="bedrooms-max" /><br>
-                </p>
-                <p>
-                <input type="checkbox" value="studio" id="studio" />
-                <label for="studio">Studio</label>
-                </p>
-                <p>
-                <input type="checkbox" value="shared" id="shared" />
-                <label for="shared">Shared</label>
-                </p>
-                <p>
-                <input type="submit" value="Filter" />
-                </p>
-            </form>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-push-4">
+                    <div id="map"></div>
+                </div>
+                <div id="search" class="col-md-4 col-md-pull-8">
+                    <h1>OpenRent</h1>
+                    <form enctype="multipart/form-data" method="post" name="kml-file" id="kml-file" class="pure-form">
+                        <div class="form-group">
+                            <label for="file">KML file</label>
+                            <input type="file" name="file" required />
+                        </div>
+                        <button type="submit" class="btn btn-default">Load</button>
+                    </form>
+                    <form name="filters" id="filters">
+                        <h2>Rent</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="rent-min">min:</label>
+                                    <input type="number" class="form-control" name="rent-min" id="rent-min" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="rent-max">max:</label>
+                                    <input type="number" class="form-control" name="rent-max" id="rent-max" />
+                                </div>
+                            </div>
+                        </div>
+                        <h2>Bedrooms</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="bedrooms-min">min:</label>
+                                    <input type="number" class="form-control" name="bedrooms-min" id="bedrooms-min" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="bedrooms-max">max:</label>
+                                    <input type="number" class="form-control" name="bedrooms-max" id="bedrooms-max" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label for="studio">
+                                <input type="checkbox" value="studio" id="studio" /> Studio
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="shared">
+                                <input type="checkbox" value="shared" id="shared" /> Shared
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-default">Filter</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div id="map"></div>
         <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
         <script src="/script.js"></script>
     </body>
