@@ -55,7 +55,15 @@ function filter(props) {
 
 function draw() {
 	drawPolygons();
-	drawMarkers(filter(properties));
+
+	const filteredProperties = filter(properties);
+	updateCount(filteredProperties.length);
+	drawMarkers(filteredProperties);
+	printResults(filteredProperties);
+}
+
+function updateCount(n) {
+	document.querySelector("#count").textContent = n;
 }
 
 function drawPolygons() {
@@ -79,5 +87,20 @@ function drawMarkers(props) {
 				`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`,
 			)
 			.addTo(map);
+	});
+}
+
+function printResults(props) {
+	document.querySelectorAll("#results .result").forEach((r) =>
+		r.remove()
+	);
+	const results = document.querySelector("#results");
+	const template = results.querySelector("template");
+	props.forEach((p) => {
+		const clone = template.content.cloneNode(true);
+		const title = clone.querySelector(".title");
+		title.textContent = p.id;
+		title.setAttribute("href", p.url);
+		results.appendChild(clone);
 	});
 }
