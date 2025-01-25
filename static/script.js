@@ -1,15 +1,16 @@
-var map = L.map('map').setView([51.505, -0.09], 12);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const map = L.map("map").setView([51.505, -0.09], 12);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 	maxZoom: 19,
-	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	attribution:
+		'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
-var properties = [];
-var polygons = [];
+let properties = [];
+let polygons = [];
 const loadForm = document.querySelector("#kml-file");
 loadForm.addEventListener("submit", (event) => {
 	const formData = new FormData(loadForm);
-	fetch("/search", { method: "POST", body: formData, })
+	fetch("/search", { method: "POST", body: formData })
 		.then((response) => response.json())
 		.then((response) => {
 			properties = response.properties;
@@ -51,7 +52,9 @@ function drawMarkers() {
 	const bedroomsMinStr = document.querySelector("#bedrooms-min").value;
 	const bedroomsMaxStr = document.querySelector("#bedrooms-max").value;
 	const bedroomsMin = bedroomsMinStr == "" ? 0 : Number(bedroomsMinStr);
-	const bedroomsMax = bedroomsMaxStr == "" ? Infinity : Number(bedroomsMaxStr);
+	const bedroomsMax = bedroomsMaxStr == ""
+		? Infinity
+		: Number(bedroomsMaxStr);
 
 	properties
 		.filter((p) => {
@@ -70,7 +73,7 @@ function drawMarkers() {
 }
 
 function drawPolygons() {
-	var latlngs = polygons.map((p) => [p.external, ...p.internals]);
-	var polygon = L.polygon(latlngs).addTo(map);
+	const latlngs = polygons.map((p) => [p.external, ...p.internals]);
+	const polygon = L.polygon(latlngs).addTo(map);
 	map.fitBounds(polygon.getBounds());
 }
