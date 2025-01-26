@@ -26,7 +26,7 @@ filterForm.addEventListener("submit", (event) => {
 	event.preventDefault();
 });
 
-function filter(props) {
+function filter(properties) {
 	const isStudio = document.querySelector("#studio").checked;
 	const isShared = document.querySelector("#shared").checked;
 
@@ -42,7 +42,7 @@ function filter(props) {
 		? Infinity
 		: Number(bedroomsMaxStr);
 
-	return props
+	return properties
 		.filter((p) => {
 			return p.studio == isStudio &&
 				p.shared == isShared &&
@@ -59,7 +59,7 @@ function draw() {
 	const filteredProperties = filter(properties);
 	updateCount(filteredProperties.length);
 	drawMarkers(filteredProperties);
-	printResults(filteredProperties);
+	printInitialResults(filteredProperties);
 }
 
 function updateCount(n) {
@@ -75,13 +75,13 @@ function drawPolygons() {
 	map.fitBounds(polygon.getBounds());
 }
 
-function drawMarkers(props) {
+function drawMarkers(properties) {
 	map.eachLayer((l) => {
 		if (l instanceof L.Marker) {
 			map.removeLayer(l);
 		}
 	});
-	props.forEach((p) => {
+	properties.forEach((p) => {
 		L.marker([p.latitude, p.longitude])
 			.bindPopup(
 				`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`,
@@ -90,13 +90,13 @@ function drawMarkers(props) {
 	});
 }
 
-function printResults(props) {
+function printInitialResults(properties) {
 	document.querySelectorAll("#results .result").forEach((r) =>
 		r.remove()
 	);
 	const results = document.querySelector("#results");
 	const template = results.querySelector("template");
-	props.forEach((p) => {
+	properties.forEach((p) => {
 		const clone = template.content.cloneNode(true);
 		const title = clone.querySelector(".title");
 		title.textContent = p.id;
