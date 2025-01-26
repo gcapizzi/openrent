@@ -6,7 +6,9 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 let properties = [];
+let visibleProperties = [];
 let polygons = [];
+
 const loadForm = document.querySelector("#kml-file");
 loadForm.addEventListener("submit", (event) => {
 	const formData = new FormData(loadForm);
@@ -14,6 +16,7 @@ loadForm.addEventListener("submit", (event) => {
 		.then((response) => response.json())
 		.then((response) => {
 			properties = response.properties;
+			visibleProperties = properties;
 			polygons = response.polygons;
 			draw();
 		});
@@ -22,9 +25,17 @@ loadForm.addEventListener("submit", (event) => {
 
 const filterForm = document.querySelector("#filters");
 filterForm.addEventListener("submit", (event) => {
+	visibleProperties = filter(properties);
 	draw();
 	event.preventDefault();
 });
+
+function draw() {
+	drawPolygons();
+	updateCount();
+	drawMarkers();
+	printInitialResults();
+}
 
 function filter(properties) {
 	const isStudio = document.querySelector("#studio").checked;
@@ -53,17 +64,8 @@ function filter(properties) {
 		});
 }
 
-function draw() {
-	drawPolygons();
-
-	const filteredProperties = filter(properties);
-	updateCount(filteredProperties.length);
-	drawMarkers(filteredProperties);
-	printInitialResults(filteredProperties);
-}
-
-function updateCount(n) {
-	document.querySelector("#count").textContent = n;
+function updateCount() {
+	document.querySelector("#count").textContent = visibleProperties.length;
 }
 
 function drawPolygons() {
@@ -75,13 +77,13 @@ function drawPolygons() {
 	map.fitBounds(polygon.getBounds());
 }
 
-function drawMarkers(properties) {
+function drawMarkers() {
 	map.eachLayer((l) => {
 		if (l instanceof L.Marker) {
 			map.removeLayer(l);
 		}
 	});
-	properties.forEach((p) => {
+	visibleProperties.forEach((p) => {
 		L.marker([p.latitude, p.longitude])
 			.bindPopup(
 				`<a href="${p.url}" target="_blank"><strong>#${p.id}</strong></a><br>Price: ${p.price}<br>Bedrooms: ${p.bedrooms}`,
@@ -90,13 +92,13 @@ function drawMarkers(properties) {
 	});
 }
 
-function printInitialResults(properties) {
+function printInitialResults() {
 	document.querySelectorAll("#results .result").forEach((r) =>
 		r.remove()
 	);
 	const results = document.querySelector("#results");
 	const template = results.querySelector("template");
-	properties.forEach((p) => {
+	visibleProperties.forEach((p) => {
 		const clone = template.content.cloneNode(true);
 		const title = clone.querySelector(".title");
 		title.textContent = p.id;
