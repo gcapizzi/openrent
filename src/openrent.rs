@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Result};
 use boa_engine::{object::builtins::JsArray, Context, JsResult, JsValue, Source};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use url::Url;
 
 #[derive(Debug, Serialize)]
 pub struct Property {
@@ -14,6 +15,18 @@ pub struct Property {
     pub live: bool,
     pub furnished: bool,
     pub url: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct PropertyDetails {
+    pub id: u32,
+    pub title: String,
+    pub image_url: String,
+    pub last_updated: String,
+    pub description: String,
+    pub details: Vec<String>,
+    pub rent_per_month: f32,
 }
 
 pub async fn get_properties(longitude: f64, latitude: f64, area: u32) -> Result<Vec<Property>> {
@@ -108,4 +121,16 @@ fn js_at_f64(context: &mut Context, array: &JsArray, index: u32) -> Result<f64> 
     js_at(context, array, index)?
         .as_number()
         .ok_or(anyhow!("invalid longitude"))
+}
+
+pub async fn get_property_details(ids: Vec<usize>) -> Result<Vec<PropertyDetails>> {
+    let mut url = Url::parse("https://www.openrent.co.uk/search/propertiesbyid")?;
+    for id in ids {
+        url.query_pairs_mut().append_pair("ids", &id.to_string());
+    }
+    let response = reqwest::get(url)
+        .await?
+        .json::<Vec<PropertyDetails>>()
+        .await?;
+    Ok(response)
 }

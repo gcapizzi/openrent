@@ -1,3 +1,8 @@
+const moneyFormat = new Intl.NumberFormat("en-FG", {
+	style: "currency",
+	currency: "GBP",
+});
+
 const map = L.map("map").setView([51.505, -0.09], 12);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 	maxZoom: 19,
@@ -18,7 +23,10 @@ loadForm.addEventListener("submit", (event) => {
 			properties = response.properties;
 			visibleProperties = properties;
 			polygons = response.polygons;
-			draw();
+			drawPolygons();
+			updateCount();
+			drawMarkers();
+			printInitialResults();
 		});
 	event.preventDefault();
 });
@@ -26,16 +34,11 @@ loadForm.addEventListener("submit", (event) => {
 const filterForm = document.querySelector("#filters");
 filterForm.addEventListener("submit", (event) => {
 	visibleProperties = filter(properties);
-	draw();
-	event.preventDefault();
-});
-
-function draw() {
-	drawPolygons();
 	updateCount();
 	drawMarkers();
 	printInitialResults();
-}
+	event.preventDefault();
+});
 
 function filter(properties) {
 	const isStudio = document.querySelector("#studio").checked;
@@ -96,13 +99,44 @@ function printInitialResults() {
 	document.querySelectorAll("#results .result").forEach((r) =>
 		r.remove()
 	);
+
 	const results = document.querySelector("#results");
 	const template = results.querySelector("template");
-	visibleProperties.forEach((p) => {
-		const clone = template.content.cloneNode(true);
-		const title = clone.querySelector(".title");
-		title.textContent = p.id;
-		title.setAttribute("href", p.url);
-		results.appendChild(clone);
-	});
+
+	const ids = visibleProperties.slice(0, 10).map((p) => p.id).join(",");
+	fetch(`/details?ids=${ids}`)
+		.then((response) => response.json())
+		.then((response) => {
+			console.log(response);
+			response.properties.forEach((p) => {
+				const clone = template.content.cloneNode(true);
+
+				const title = clone.querySelector(".title");
+				title.textContent = p.title;
+				title.setAttribute(
+					"href",
+					`https://www.openrent.co.uk/${p.id}`,
+				);
+
+				clone.querySelector(".rent")
+					.textContent = moneyFormat.format(
+						p.rent_per_month,
+					);
+				clone.querySelector(".picture").setAttribute(
+					"src",
+					p.image_url,
+				);
+				clone.querySelector(".last-updated")
+					.textContent = p.last_updated;
+
+				const details = clone.querySelector(".details");
+				p.details.forEach((d) => {
+					const li = document.createElement("li");
+					li.textContent = d;
+					details.appendChild(li);
+				});
+
+				results.appendChild(clone);
+			});
+		});
 }
