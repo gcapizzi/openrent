@@ -10,8 +10,11 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 		'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
+const PAGE_SIZE = 10;
+
 let properties = [];
 let visibleProperties = [];
+let cursor = 0;
 let polygons = [];
 
 const loadForm = document.querySelector("#kml-file");
@@ -37,6 +40,12 @@ filterForm.addEventListener("submit", (event) => {
 	updateCount();
 	drawMarkers();
 	printInitialResults();
+	event.preventDefault();
+});
+
+const loadMoreButton = document.querySelector("#load-more");
+loadMoreButton.addEventListener("click", (event) => {
+	printMoreResults();
 	event.preventDefault();
 });
 
@@ -96,14 +105,22 @@ function drawMarkers() {
 }
 
 function printInitialResults() {
-	document.querySelectorAll("#results .result").forEach((r) =>
-		r.remove()
+	document.querySelector("#results .list").textContent = "";
+	cursor = 0;
+	printMoreResults();
+}
+
+function printMoreResults() {
+	const ids = visibleProperties.slice(cursor, cursor + PAGE_SIZE).map((
+		p,
+	) => p.id).join(
+		",",
 	);
+	cursor += PAGE_SIZE;
 
-	const results = document.querySelector("#results");
-	const template = results.querySelector("template");
+	const results = document.querySelector("#results .list");
+	const template = document.querySelector("#results template");
 
-	const ids = visibleProperties.slice(0, 10).map((p) => p.id).join(",");
 	fetch(`/details?ids=${ids}`)
 		.then((response) => response.json())
 		.then((response) => {
