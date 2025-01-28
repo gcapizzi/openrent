@@ -73,7 +73,7 @@ function filter(properties) {
 				p.price <= rentMax &&
 				p.bedrooms >= bedroomsMin &&
 				p.bedrooms <= bedroomsMax;
-		});
+		}).toSorted((a, b) => a.price - b.price);
 }
 
 function updateCount() {
