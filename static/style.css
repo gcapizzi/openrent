@@ -5,3 +5,16 @@
 #load-more {
 	width: 100%;
 }
+
+#load-more .spinner {
+	display: none;
+	margin: 0 auto;
+}
+
+#load-more:disabled .spinner {
+	display: block;
+}
+
+#load-more:disabled .text {
+	display: none;
+}

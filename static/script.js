@@ -121,10 +121,12 @@ function printMoreResults() {
 	const results = document.querySelector("#results .list");
 	const template = document.querySelector("#results template");
 
+	document.getElementById("load-more").disabled = true;
 	fetch(`/details?ids=${ids}`)
 		.then((response) => response.json())
 		.then((response) => {
-			console.log(response);
+			document.getElementById("load-more").disabled = false;
+
 			response.properties.forEach((p) => {
 				const clone = template.content.cloneNode(true);
 
