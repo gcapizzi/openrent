@@ -111,6 +111,12 @@ function printInitialResults() {
 }
 
 function printMoreResults() {
+	if (cursor > visibleProperties.length) {
+		return;
+	} else {
+		document.getElementById("load-more").style.display = "block";
+	}
+
 	const ids = visibleProperties.slice(cursor, cursor + PAGE_SIZE).map((
 		p,
 	) => p.id).join(
@@ -126,6 +132,10 @@ function printMoreResults() {
 		.then((response) => response.json())
 		.then((response) => {
 			document.getElementById("load-more").disabled = false;
+			if (cursor > visibleProperties.length) {
+				document.getElementById("load-more").style
+					.display = "none";
+			}
 
 			response.properties.forEach((p) => {
 				const clone = template.content.cloneNode(true);
