@@ -49,6 +49,10 @@ loadMoreButton.addEventListener("click", (event) => {
 	event.preventDefault();
 });
 
+document.addEventListener("scrollend", (event) => {
+	printMoreResults();
+});
+
 function filter(properties) {
 	const isStudio = document.querySelector("#studio").checked;
 	const isShared = document.querySelector("#shared").checked;
