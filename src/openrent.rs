@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{anyhow, Result};
 use boa_engine::{object::builtins::JsArray, Context, JsResult, JsValue, Source};
 use serde::{Deserialize, Serialize};
@@ -20,7 +22,7 @@ pub struct Property {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct PropertyDetails {
-    pub id: u32,
+    pub id: usize,
     pub title: String,
     pub image_url: String,
     pub last_updated: String,
@@ -125,12 +127,19 @@ fn js_at_f64(context: &mut Context, array: &JsArray, index: u32) -> Result<f64> 
 
 pub async fn get_property_details(ids: Vec<usize>) -> Result<Vec<PropertyDetails>> {
     let mut url = Url::parse("https://www.openrent.co.uk/search/propertiesbyid")?;
-    for id in ids {
+    for id in &ids {
         url.query_pairs_mut().append_pair("ids", &id.to_string());
     }
-    let response = reqwest::get(url)
+    let mut property_details_map: HashMap<usize, PropertyDetails> = reqwest::get(url)
         .await?
         .json::<Vec<PropertyDetails>>()
-        .await?;
-    Ok(response)
+        .await?
+        .into_iter()
+        .map(|p| (p.id, p))
+        .collect();
+    let property_details = ids
+        .iter()
+        .map(|id| property_details_map.remove(id).unwrap())
+        .collect();
+    Ok(property_details)
 }
