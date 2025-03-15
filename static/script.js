@@ -70,6 +70,15 @@ function filter(properties) {
 		? Infinity
 		: Number(bedroomsMaxStr);
 
+	const moveInMinStr = document.querySelector("#move-in-min").value;
+	const moveInMaxStr = document.querySelector("#move-in-max").value;
+	const moveInMin = moveInMinStr == ""
+		? -Infinity
+		: Date.parse(moveInMinStr);
+	const moveInMax = moveInMaxStr == ""
+		? Infinity
+		: Date.parse(moveInMaxStr);
+
 	return properties
 		.filter((p) => {
 			return p.studio == isStudio &&
@@ -77,7 +86,9 @@ function filter(properties) {
 				p.price >= rentMin &&
 				p.price <= rentMax &&
 				p.bedrooms >= bedroomsMin &&
-				p.bedrooms <= bedroomsMax;
+				p.bedrooms <= bedroomsMax &&
+				Date.parse(p.available_from) >= moveInMin &&
+				Date.parse(p.available_from) <= moveInMax;
 		}).toSorted((a, b) => a.price - b.price);
 }
 

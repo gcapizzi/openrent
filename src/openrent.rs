@@ -16,6 +16,7 @@ pub struct Property {
     pub studio: bool,
     pub live: bool,
     pub furnished: bool,
+    pub available_from: String,
     pub url: String,
 }
 
@@ -67,6 +68,7 @@ fn parse_properties(script: String) -> Result<Vec<Property>> {
     let shared = js_eval_array(&mut context, "isshared")?;
     let live = js_eval_array(&mut context, "islivelistBool")?;
     let furnished = js_eval_array(&mut context, "furnished")?;
+    let available_from = js_eval_array(&mut context, "availableFrom")?;
 
     (0..js_len(&mut context, &ids)?)
         .map(|i| {
@@ -81,6 +83,7 @@ fn parse_properties(script: String) -> Result<Vec<Property>> {
                 shared: js_at_i8(&mut context, &shared, i)? == 1,
                 live: js_at_i8(&mut context, &live, i)? == 1,
                 furnished: js_at_i8(&mut context, &furnished, i)? == 1,
+                available_from: relative_date_string(js_at_i32(&mut context, &available_from, i)?)?,
                 url: format!("https://www.openrent.co.uk/{}", id),
             })
         })
@@ -123,6 +126,19 @@ fn js_at_f64(context: &mut Context, array: &JsArray, index: u32) -> Result<f64> 
     js_at(context, array, index)?
         .as_number()
         .ok_or(anyhow!("invalid longitude"))
+}
+
+fn js_at_i32(context: &mut Context, array: &JsArray, index: u32) -> Result<i32> {
+    js_err(js_at(context, array, index)?.to_i32(context))
+}
+
+fn relative_date_string(delta_days: i32) -> Result<String> {
+    chrono::NaiveDate::checked_add_signed(
+        chrono::Local::now().date_naive(),
+        chrono::TimeDelta::days(delta_days.into()),
+    )
+    .map(|d| d.format("%Y-%m-%d").to_string())
+    .ok_or(anyhow!("failed to calculate date"))
 }
 
 pub async fn get_property_details(ids: Vec<usize>) -> Result<Vec<PropertyDetails>> {

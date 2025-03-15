@@ -9,6 +9,7 @@ edition = "2021"
 anyhow = "1"
 axum = { version = "*", features = ["json", "multipart"] }
 boa_engine = "*"
+chrono = "*"
 geo = "*"
 kml = { version = "*", features = ["geo-types"] }
 reqwest = { version = "*", features = ["blocking", "json"] }
