@@ -50,7 +50,7 @@ loadMoreButton.addEventListener("click", (event) => {
 	event.preventDefault();
 });
 
-document.addEventListener("scrollend", (event) => {
+document.addEventListener("scrollend", (_) => {
 	printMoreResults();
 });
 
