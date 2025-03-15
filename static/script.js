@@ -24,24 +24,25 @@ loadForm.addEventListener("submit", (event) => {
 		.then((response) => response.json())
 		.then((response) => {
 			properties = response.properties;
-			visibleProperties = properties;
 			polygons = response.polygons;
 			drawPolygons();
-			updateCount();
-			drawMarkers();
-			printInitialResults();
+			applyFilters();
 		});
 	event.preventDefault();
 });
 
 const filterForm = document.querySelector("#filters");
 filterForm.addEventListener("submit", (event) => {
+	applyFilters();
+	event.preventDefault();
+});
+
+function applyFilters() {
 	visibleProperties = filter(properties);
 	updateCount();
 	drawMarkers();
 	printInitialResults();
-	event.preventDefault();
-});
+}
 
 const loadMoreButton = document.querySelector("#load-more");
 loadMoreButton.addEventListener("click", (event) => {
